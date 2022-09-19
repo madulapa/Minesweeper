@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -28,6 +30,9 @@ public class MainActivity extends AppCompatActivity {
     // when a TextView is clicked, we know which cell it is
     private ArrayList<TextView> cell_tvs;
     private ArrayList<TextView> bombs;
+    private ArrayList<Integer> rightmost = new ArrayList<>();
+    private ArrayList<Integer> leftmost = new ArrayList<>();
+
 
     private int dpToPixel(int dp) {
         float density = Resources.getSystem().getDisplayMetrics().density;
@@ -94,21 +99,27 @@ public class MainActivity extends AppCompatActivity {
                 tv.setTextColor(Color.BLACK);
                 tv.setBackgroundColor(Color.parseColor("black"));
             }
-            else if(tv.getText() != "flagged") {
-                tv.setTextColor(Color.BLACK);
-                tv.setBackgroundColor(Color.parseColor("white"));
-                //run the BFS
-
-
+            else{
+                BFS(tv);
             }
         }
-        if(mode == "flag" && flags > 0 && tv.getText() != "flagged"){
+        if(mode == "flag"){
+            if(tv.getText() == "flagged"){
+                tv.setBackgroundColor(Color.GREEN);
+                tv.setText("notFlagged");
+                tv.setTextColor(00000000);
+                flags++;
+            }
+            else {
+                if(flags != 0) {
+                    tv.setTextColor(Color.RED);
+                    tv.setText("flagged");
+                    tv.setTextColor(00000000);
+                    tv.setBackgroundResource(R.drawable.flag_1_30x20);
+                    flags--;
+                }
+            }
 
-            tv.setTextColor(Color.RED);
-            tv.setText("flagged");
-            tv.setTextColor(00000000);
-            tv.setBackgroundResource(R.drawable.flag_1_30x20);
-            flags--;
             updateFlagCount();
         }
     }
@@ -157,45 +168,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setValues(){
-        ArrayList<Integer> rightmost = new ArrayList<>();
         for(int i = 7; i < 81; i+=8) {rightmost.add(i);}
-        ArrayList<Integer> leftmost = new ArrayList<>();
-        for(int i = 0; i < 80; i+=8) {rightmost.add(i);}
-
+        for(int i = 0; i < 80; i+=8) {leftmost.add(i);}
         for(int i = 0; i < bombs.size(); i++){
-            int idx = findIndexOfCellTextView(bombs.get(i));
-            System.out.println(idx);
-            // { r+1, c }
-            if((idx+8) < 80) { // check to make sure its not past the bottom row
-                cell_tvs.get(idx + 8).setText(dist(idx + 8));
-            }
-            // { r-1, c }
-            if((idx - 8) >= 0){ // check to make sure its not above the top row
-                cell_tvs.get(idx - 8).setText(dist(idx - 8));
-            }
-            // { r, c+1 }
-            if(!rightmost.contains(idx)){ //making sure its not past the rightmost column
-                cell_tvs.get(idx + 1).setText(dist(idx + 1));
-            }
-            // { r, c-1 }
-            if(!leftmost.contains(idx)){ //making sure its not before the leftmost column
-                cell_tvs.get(idx - 1).setText(dist(idx - 1));
-            }
-            // { r+1, c+1 }
-            if(idx < 72 && !rightmost.contains(idx)){ // not along rightmost column && not along bottom row
-                cell_tvs.get(idx + 9).setText(dist(idx + 9));
-            }
-            // { r-1, c+1 }
-            if(idx > 7 && !rightmost.contains(idx) ){ // not along rightmost column && not along top row
-                cell_tvs.get(idx - 7).setText(dist(idx - 7));
-            }
-            // { r-1, c-1 }
-            if(idx > 7 && !leftmost.contains(idx) ){ // not along leftmost column && not along top row
-                cell_tvs.get(idx - 9).setText(dist(idx - 9));
-            }
-            // { r+1, c-1 }
-            if(idx < 72 && !leftmost.contains(idx)){ // not along leftmost column && not along bottom row
-                cell_tvs.get(idx + 7).setText(dist(idx + 7));
+            //int idx = findIndexOfCellTextView(bombs.get(i));
+            ArrayList<TextView> adjList = adjCells(bombs.get(i));
+            for(int j = 0; j < adjList.size(); j++){
+                Integer idx = findIndexOfCellTextView(adjList.get(j));
+                cell_tvs.get(idx).setText(dist(idx));
             }
         }
     }
@@ -204,6 +184,67 @@ public class MainActivity extends AppCompatActivity {
         if(cell_tvs.get(x).getText() == "1") return "2";
         else if(cell_tvs.get(x).getText() == "2") return "3";
         else return "1";
+    }
+
+    private ArrayList<TextView> adjCells(TextView tv){
+        int idx = findIndexOfCellTextView(tv);
+        ArrayList<TextView> res = new ArrayList<>();
+        // { r+1, c }
+        if((idx+8) < 80) { // check to make sure its not past the bottom row
+            res.add(cell_tvs.get(idx+8));
+        }
+        // { r-1, c }
+        if((idx - 8) >= 0){ // check to make sure its not above the top row
+            res.add(cell_tvs.get(idx-8));
+        }
+        // { r, c+1 }
+        if(!rightmost.contains(idx)){ //making sure its not past the rightmost column
+            res.add(cell_tvs.get(idx+1));
+        }
+        // { r, c-1 }
+        if(!leftmost.contains(idx)){ //making sure its not before the leftmost column
+            res.add(cell_tvs.get(idx-1));
+        }
+        // { r+1, c+1 }
+        if(idx < 72 && !rightmost.contains(idx)){ // not along rightmost column && not along bottom row
+            res.add(cell_tvs.get(idx+9));
+        }
+        // { r-1, c+1 }
+        if(idx > 7 && !rightmost.contains(idx) ){ // not along rightmost column && not along top row
+            res.add(cell_tvs.get(idx-7));
+        }
+        // { r-1, c-1 }
+        if(idx > 7 && !leftmost.contains(idx) ){ // not along leftmost column && not along top row
+            res.add(cell_tvs.get(idx-9));
+        }
+        // { r+1, c-1 }
+        if(idx < 72 && !leftmost.contains(idx)){ // not along leftmost column && not along bottom row
+            res.add(cell_tvs.get(idx+7));
+        }
+        return res;
+    }
+
+    private void BFS(TextView tv){
+
+        Queue<TextView> q = new LinkedList<TextView>();
+        q.add(tv);
+        while(!q.isEmpty()){
+            TextView temp = q.poll();
+            temp.setBackgroundColor(Color.parseColor("gray"));;
+            if(temp.getText() != "1" && temp.getText() != "2" && temp.getText() != "3"){
+                temp.setTextColor(Color.parseColor("gray"));
+                ArrayList<TextView> adjCellsList = adjCells(temp);
+                System.out.println(adjCellsList.size());
+
+                for(int i = 0; i < adjCellsList.size(); i++){
+                    adjCellsList.get(i).setBackgroundColor(Color.parseColor("gray"));
+                    if (adjCellsList.get(i).getText() != "1" && adjCellsList.get(i).getText() != "2" && adjCellsList.get(i).getText() != "3") {
+                        q.add(adjCellsList.get(i));
+                        adjCellsList.get(i).setTextColor(Color.parseColor("gray"));
+                    }
+                }
+            }
+        }
     }
 
 
