@@ -226,24 +226,32 @@ public class MainActivity extends AppCompatActivity {
 
     private void BFS(TextView tv){
 
-        Queue<TextView> q = new LinkedList<TextView>();
+        Queue<TextView> q = new LinkedList<>();
+        ArrayList<TextView> turnGray = new ArrayList<>();
         q.add(tv);
         while(!q.isEmpty()){
             TextView temp = q.poll();
-            temp.setBackgroundColor(Color.parseColor("gray"));;
-            if(temp.getText() != "1" && temp.getText() != "2" && temp.getText() != "3"){
-                temp.setTextColor(Color.parseColor("gray"));
+            turnGray.add(temp);
+            if(temp.getText() != "1" && temp.getText() != "2" && temp.getText() != "3" && temp.getText() != "bomb"){
+                temp.setText("found");
                 ArrayList<TextView> adjCellsList = adjCells(temp);
-                System.out.println(adjCellsList.size());
-
                 for(int i = 0; i < adjCellsList.size(); i++){
-                    adjCellsList.get(i).setBackgroundColor(Color.parseColor("gray"));
-                    if (adjCellsList.get(i).getText() != "1" && adjCellsList.get(i).getText() != "2" && adjCellsList.get(i).getText() != "3") {
+                    System.out.println("here");
+                    turnGray.add(adjCellsList.get(i));
+                    if (adjCellsList.get(i).getText() != "1" && adjCellsList.get(i).getText()
+                            != "2" && adjCellsList.get(i).getText() != "3" && adjCellsList.get(i).getText() != "bomb" && adjCellsList.get(i).getText() != "found") {
                         q.add(adjCellsList.get(i));
-                        adjCellsList.get(i).setTextColor(Color.parseColor("gray"));
+                        System.out.println("index: " + findIndexOfCellTextView(adjCellsList.get(i)));
+                        adjCellsList.get(i).setText("found");
+
                     }
+                    System.out.println(q.size());
                 }
             }
+        }
+
+        for(int i = 0; i < turnGray.size(); i++){
+            turnGray.get(i).setBackgroundColor(Color.parseColor("gray"));
         }
     }
 
