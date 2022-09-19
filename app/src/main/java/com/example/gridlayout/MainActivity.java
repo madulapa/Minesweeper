@@ -14,6 +14,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     // save the TextViews of all cells in an array, so later on,
     // when a TextView is clicked, we know which cell it is
     private ArrayList<TextView> cell_tvs;
+    private ArrayList<TextView> bombs;
 
     private int dpToPixel(int dp) {
         float density = Resources.getSystem().getDisplayMetrics().density;
@@ -36,14 +39,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         cell_tvs = new ArrayList<TextView>();
+        bombs = new ArrayList<TextView>();
         // Method (3): add four dynamically created cells with LayoutInflater
         GridLayout grid = (GridLayout) findViewById(R.id.gridLayout01);
         LayoutInflater li = LayoutInflater.from(this);
         for (int i = 0; i<=9; i++) {
             for (int j=0; j<=7; j++) {
                 TextView tv = (TextView) li.inflate(R.layout.custom_cell_layout, grid, false);
-                //tv.setText(String.valueOf(i)+String.valueOf(j));
-                tv.setTextColor(Color.GREEN);
+                tv.setText(String.valueOf(i)+String.valueOf(j));
+                //tv.setTextColor(Color.GREEN);
                 tv.setBackgroundColor(Color.GREEN);
                 tv.setOnClickListener(this::onClickTV);
 
@@ -55,17 +59,21 @@ public class MainActivity extends AppCompatActivity {
                 grid.addView(tv, lp);
 
                 cell_tvs.add(tv);
+
             }
         }
         for(int i = 0; i < 4; i++) {
             Random generator = new Random();
-            int randomIndex = generator.nextInt(cell_tvs.size());
+            int randomIndex = generator.nextInt(cell_tvs.size()-1);
+            bombs.add(cell_tvs.get(randomIndex));
             cell_tvs.get(randomIndex).setText("bomb");
+            cell_tvs.get(randomIndex).setBackgroundColor(Color.BLACK);
         }
         runTimer();
         updateFlagCount();
         final ImageButton img = (ImageButton) findViewById(R.id.button);
         img.setBackgroundResource(R.drawable.picker);
+        setValues();
 
 
     }
@@ -87,8 +95,11 @@ public class MainActivity extends AppCompatActivity {
                 tv.setBackgroundColor(Color.parseColor("black"));
             }
             else if(tv.getText() != "flagged") {
-                tv.setTextColor(Color.GREEN);
-                tv.setBackgroundColor(Color.parseColor("lime"));
+                tv.setTextColor(Color.BLACK);
+                tv.setBackgroundColor(Color.parseColor("white"));
+                //run the BFS
+
+
             }
         }
         if(mode == "flag" && flags > 0 && tv.getText() != "flagged"){
@@ -145,13 +156,55 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-   /* public int minesweeperBFS(TextView tv){
-        int n = findIndexOfCellTextView(tv);
-        int i = n/COLUMN_COUNT;
-        int j = n%COLUMN_COUNT;
+    private void setValues(){
+        ArrayList<Integer> rightmost = new ArrayList<>();
+        for(int i = 7; i < 81; i+=8) {rightmost.add(i);}
+        ArrayList<Integer> leftmost = new ArrayList<>();
+        for(int i = 0; i < 80; i+=8) {rightmost.add(i);}
 
+        for(int i = 0; i < bombs.size(); i++){
+            int idx = findIndexOfCellTextView(bombs.get(i));
+            System.out.println(idx);
+            // { r+1, c }
+            if((idx+8) < 80) { // check to make sure its not past the bottom row
+                cell_tvs.get(idx + 8).setText(dist(idx + 8));
+            }
+            // { r-1, c }
+            if((idx - 8) >= 0){ // check to make sure its not above the top row
+                cell_tvs.get(idx - 8).setText(dist(idx - 8));
+            }
+            // { r, c+1 }
+            if(!rightmost.contains(idx)){ //making sure its not past the rightmost column
+                cell_tvs.get(idx + 1).setText(dist(idx + 1));
+            }
+            // { r, c-1 }
+            if(!leftmost.contains(idx)){ //making sure its not before the leftmost column
+                cell_tvs.get(idx - 1).setText(dist(idx - 1));
+            }
+            // { r+1, c+1 }
+            if(idx < 72 && !rightmost.contains(idx)){ // not along rightmost column && not along bottom row
+                cell_tvs.get(idx + 9).setText(dist(idx + 9));
+            }
+            // { r-1, c+1 }
+            if(idx > 7 && !rightmost.contains(idx) ){ // not along rightmost column && not along top row
+                cell_tvs.get(idx - 7).setText(dist(idx - 7));
+            }
+            // { r-1, c-1 }
+            if(idx > 7 && !leftmost.contains(idx) ){ // not along leftmost column && not along top row
+                cell_tvs.get(idx - 9).setText(dist(idx - 9));
+            }
+            // { r+1, c-1 }
+            if(idx < 72 && !leftmost.contains(idx)){ // not along leftmost column && not along bottom row
+                cell_tvs.get(idx + 7).setText(dist(idx + 7));
+            }
+        }
+    }
 
-    }*/
+    private String dist(int x){
+        if(cell_tvs.get(x).getText() == "1") return "2";
+        else if(cell_tvs.get(x).getText() == "2") return "3";
+        else return "1";
+    }
 
 
 }
