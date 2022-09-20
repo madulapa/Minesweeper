@@ -10,16 +10,18 @@
         android:id="@+id/textView00"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginEnd="2dp"
-        android:layout_marginBottom="2dp"
-        android:height="64dp"
         android:width="64dp"
+        android:height="64dp"
         android:text="@string/flag"
-        android:textSize="32sp"
         android:textAlignment="center"
+        android:textSize="32sp"
         app:layout_column="0"
+        app:layout_constraintBottom_toBottomOf="@+id/button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.152"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.024"
         app:layout_row="0" />
 
     <TextView
@@ -27,22 +29,29 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:width="150dp"
-        android:height="64dp"
+        android:height="50dp"
         android:textAlignment="center"
-        android:textSize="32sp"
+        android:textSize="25sp"
         app:layout_column="0"
+        app:layout_constraintBottom_toBottomOf="@+id/button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.264"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.024"
         app:layout_row="0" />
 
     <TextView
         android:id="@+id/clock"
         android:layout_width="125dp"
         android:layout_height="30dp"
+        android:layout_marginTop="16dp"
         android:gravity="center_horizontal|center_vertical"
         android:text="@string/clock"
         android:textAlignment="center"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.839"
+        app:layout_constraintHorizontal_bias="0.716"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -50,19 +59,20 @@
         android:id="@+id/textView"
         android:layout_width="125dp"
         android:layout_height="30dp"
+        android:layout_marginTop="16dp"
         android:gravity="center_horizontal|center_vertical"
         android:text="TextView"
         android:textAlignment="center"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.993"
+        app:layout_constraintHorizontal_bias="0.912"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.gridlayout.widget.GridLayout
         android:id="@+id/gridLayout01"
         android:layout_width="350dp"
-        android:layout_height="550dp"
+        android:layout_height="500dp"
         android:layout_gravity="center"
         android:layout_marginEnd="32dp"
         app:columnCount="8"
@@ -71,7 +81,7 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.757"
+        app:layout_constraintVertical_bias="0.669"
         app:rowCount="10">
 
 
@@ -82,7 +92,7 @@
         android:layout_width="80dp"
         android:layout_height="60dp"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="16dp"
         android:onClick="onClickMode"
         android:text="Button"
         app:layout_constraintBottom_toBottomOf="parent"
