@@ -24,6 +24,8 @@
         </activity>
         <activity android:name=".LosingPage"
             android:exported="true"> </activity>
+        <activity android:name=".WinningPage"
+            android:exported="true"> </activity>
 
 
 

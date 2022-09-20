@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<TextView> bombs;
     private ArrayList<Integer> rightmost = new ArrayList<>();
     private ArrayList<Integer> leftmost = new ArrayList<>();
+    private ArrayList<Integer> foundCells = new ArrayList<>();
 
 
     private int dpToPixel(int dp) {
@@ -56,16 +57,11 @@ public class MainActivity extends AppCompatActivity {
                 tv.setTextColor(00000000);
                 tv.setBackgroundColor(Color.GREEN);
                 tv.setOnClickListener(this::onClickTV);
-
-
                 GridLayout.LayoutParams lp = (GridLayout.LayoutParams) tv.getLayoutParams();
                 lp.rowSpec = GridLayout.spec(i);
                 lp.columnSpec = GridLayout.spec(j);
-
                 grid.addView(tv, lp);
-
                 cell_tvs.add(tv);
-
             }
         }
         for(int i = 0; i < 4; i++) {
@@ -74,15 +70,12 @@ public class MainActivity extends AppCompatActivity {
             bombs.add(cell_tvs.get(randomIndex));
             cell_tvs.get(randomIndex).setText("bomb");
             cell_tvs.get(randomIndex).setTextColor(00000000);
-            //cell_tvs.get(randomIndex).setBackgroundColor(Color.BLACK);
         }
         runTimer();
         updateFlagCount();
         final ImageButton img = (ImageButton) findViewById(R.id.button);
         img.setBackgroundResource(R.drawable.picker);
         setValues();
-
-
     }
 
     private int findIndexOfCellTextView(TextView tv) {
@@ -95,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickTV(View view){
         TextView tv = (TextView) view;
-
         if (mode == "picker") {
             if(tv.getText() == "bomb"){
                 //YOU LOSE
@@ -109,6 +101,12 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
             else{
+                if(foundCells.size() == 76){
+                    //GO TO WINNING PAGE
+                    Intent intent = new Intent(this, WinningPage.class);
+                    intent.putExtra("com.example.gridlayout.CLOCK", Integer.toString(clock));
+                    startActivity(intent);
+                }
                 BFS(tv);
             }
         }
@@ -128,7 +126,6 @@ public class MainActivity extends AppCompatActivity {
                     flags--;
                 }
             }
-
             updateFlagCount();
         }
     }
@@ -240,8 +237,12 @@ public class MainActivity extends AppCompatActivity {
         while(!q.isEmpty()){
             TextView temp = q.poll();
             turnGray.add(temp);
+            if(!foundCells.contains(findIndexOfCellTextView(temp))) {
+                foundCells.add(findIndexOfCellTextView(temp));
+            }
             if(temp.getText() != "1" && temp.getText() != "2" && temp.getText() != "3" && temp.getText() != "bomb"){
                 temp.setText("found");
+
                 ArrayList<TextView> adjCellsList = adjCells(temp);
                 for(int i = 0; i < adjCellsList.size(); i++){
                     turnGray.add(adjCellsList.get(i));
@@ -250,6 +251,9 @@ public class MainActivity extends AppCompatActivity {
                         q.add(adjCellsList.get(i));
                         adjCellsList.get(i).setText("found");
                     }
+                    if(!foundCells.contains(findIndexOfCellTextView(adjCellsList.get(i)))) {
+                        foundCells.add(findIndexOfCellTextView(adjCellsList.get(i)));
+                    }
                 }
             }
         }
@@ -257,11 +261,11 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 0; i < turnGray.size(); i++){
             if(turnGray.get(i).getText() != "bomb") {
                 turnGray.get(i).setBackgroundColor(Color.parseColor("gray"));
+                turnGray.get(i).setTextColor(Color.BLACK);
             }
-            if(turnGray.get(i).getText() != "1" && turnGray.get(i).getText() != "2" && turnGray.get(i).getText() != "3")
+            if(turnGray.get(i).getText() != "1" && turnGray.get(i).getText() != "2" && turnGray.get(i).getText() != "3") {
                 turnGray.get(i).setTextColor(Color.parseColor("gray"));
+            }
         }
     }
-
-
 }
