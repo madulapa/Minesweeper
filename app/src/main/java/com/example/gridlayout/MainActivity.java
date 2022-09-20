@@ -3,6 +3,7 @@ package com.example.gridlayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.gridlayout.widget.GridLayout;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             for (int j=0; j<=7; j++) {
                 TextView tv = (TextView) li.inflate(R.layout.custom_cell_layout, grid, false);
                 tv.setText(String.valueOf(i)+String.valueOf(j));
-                //tv.setTextColor(Color.GREEN);
+                tv.setTextColor(00000000);
                 tv.setBackgroundColor(Color.GREEN);
                 tv.setOnClickListener(this::onClickTV);
 
@@ -72,7 +73,8 @@ public class MainActivity extends AppCompatActivity {
             int randomIndex = generator.nextInt(cell_tvs.size()-1);
             bombs.add(cell_tvs.get(randomIndex));
             cell_tvs.get(randomIndex).setText("bomb");
-            cell_tvs.get(randomIndex).setBackgroundColor(Color.BLACK);
+            cell_tvs.get(randomIndex).setTextColor(00000000);
+            //cell_tvs.get(randomIndex).setBackgroundColor(Color.BLACK);
         }
         runTimer();
         updateFlagCount();
@@ -96,8 +98,15 @@ public class MainActivity extends AppCompatActivity {
 
         if (mode == "picker") {
             if(tv.getText() == "bomb"){
-                tv.setTextColor(Color.BLACK);
-                tv.setBackgroundColor(Color.parseColor("black"));
+                //YOU LOSE
+                for(int i = 0; i < bombs.size(); i++){
+                    bombs.get(i).setBackgroundResource(R.drawable.bomb_30x30);
+                    tv.setTextColor(00000000);
+                }
+                //GO TO LOSING PAGE
+                Intent intent = new Intent(this, LosingPage.class);
+                intent.putExtra("com.example.gridlayout.CLOCK", Integer.toString(clock));
+                startActivity(intent);
             }
             else{
                 BFS(tv);
@@ -171,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 7; i < 81; i+=8) {rightmost.add(i);}
         for(int i = 0; i < 80; i+=8) {leftmost.add(i);}
         for(int i = 0; i < bombs.size(); i++){
-            //int idx = findIndexOfCellTextView(bombs.get(i));
             ArrayList<TextView> adjList = adjCells(bombs.get(i));
             for(int j = 0; j < adjList.size(); j++){
                 Integer idx = findIndexOfCellTextView(adjList.get(j));
@@ -236,22 +244,22 @@ public class MainActivity extends AppCompatActivity {
                 temp.setText("found");
                 ArrayList<TextView> adjCellsList = adjCells(temp);
                 for(int i = 0; i < adjCellsList.size(); i++){
-                    System.out.println("here");
                     turnGray.add(adjCellsList.get(i));
                     if (adjCellsList.get(i).getText() != "1" && adjCellsList.get(i).getText()
                             != "2" && adjCellsList.get(i).getText() != "3" && adjCellsList.get(i).getText() != "bomb" && adjCellsList.get(i).getText() != "found") {
                         q.add(adjCellsList.get(i));
-                        System.out.println("index: " + findIndexOfCellTextView(adjCellsList.get(i)));
                         adjCellsList.get(i).setText("found");
-
                     }
-                    System.out.println(q.size());
                 }
             }
         }
 
         for(int i = 0; i < turnGray.size(); i++){
-            turnGray.get(i).setBackgroundColor(Color.parseColor("gray"));
+            if(turnGray.get(i).getText() != "bomb") {
+                turnGray.get(i).setBackgroundColor(Color.parseColor("gray"));
+            }
+            if(turnGray.get(i).getText() != "1" && turnGray.get(i).getText() != "2" && turnGray.get(i).getText() != "3")
+                turnGray.get(i).setTextColor(Color.parseColor("gray"));
         }
     }
 
